@@ -2,7 +2,7 @@ import job from "./job";
 import _string from "../utils/string";
 
 class connection {
-  baseurl: string = "http;//roblox.com/";
+  baseurl: string = "http://roblox.com";
   ip: string = "127.0.0.1";
   port: number = 64989;
   secure: boolean = false;
