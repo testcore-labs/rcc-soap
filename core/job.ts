@@ -2,7 +2,7 @@ import parser from "xml-js";
 
 type job_types = { 
   job_id: string|number
-  script: {[key: string]: number|string|boolean|undefined}|string|null;
+  script: {[key: string]: any}|string|null;
   expiration: number;
   cores: number;
 }
@@ -15,13 +15,24 @@ class job {
     baseurl: ""
   }
 
+  script_luajson(script: job_types["script"]): string {
+    if(typeof script === "object") {
+      let json = JSON.stringify(script, null, 0);
+      return json;
+    } else {
+      return script;
+    }
+  }
+
   async soap(xml: string|{[key: string|number]: any}) {
     try {
       let pure_xml = ""; 
       if(typeof xml == "string") {
         pure_xml = xml;
       } else {
-        pure_xml = parser.js2xml(xml, { compact: true, spaces: 2 });
+        if(xml._declaration) {
+          pure_xml = parser.js2xml(xml, { compact: true, spaces: 2 });
+        }
       }
       let url = `${this.connection.secure ? "https" : "http" }://${this.connection.ip}:${this.connection.port}`;
       const response = await fetch(url, { 
@@ -43,7 +54,7 @@ class job {
   async open_job_ex(
     job_id: job_types["job_id"], 
     script: job_types["script"] = null, 
-    expiration: job_types["expiration"], 
+    expiration: job_types["expiration"] = 10, 
     cores: job_types["cores"] = 1
   ) {
 		let [err, parsed, raw] = await this.soap({
@@ -73,7 +84,7 @@ class job {
             'ns1:script': {
               'ns1:name': { _text: `${String(job_id)}-Script` },
               'ns1:script': {
-                _text: script
+                _text: this.script_luajson(script)
               },
               'ns1:arguments': {}
             }

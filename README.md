@@ -1,15 +1,12 @@
-# rcc-soap
+# RCC-SOAP
+Interact with your R* Cloud Compute Service executable with ease!\
+Here's how you can run a job with a custom Lua script! 
+```typescript
+import rcc from "rcc-soap";
 
-To install dependencies:
+const conn = new rcc.connection("127.0.0.1", 64989, false);
+// job_id, script (lua or json), expiration (in seconds)
+const response = conn.job().open("job_id", "print('script here')", 10);
 
-```bash
-bun install
+console.log(response);
 ```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.1.25. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
